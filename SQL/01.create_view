@@ -1,0 +1,17 @@
+CREATE VIEW vw_sales_analysis AS 
+SELECT 
+	s.sale_id,s.sale_date,c.customer_id,c.customer_name,c.city,c.customer_type,
+    s.product_id,p.product_name,p.product_category,
+    p.unit_cost,p.unit_price,
+    (p.unit_price*quantity) AS Revenue, 
+    (quantity*unit_cost) AS Cost,
+    ((quantity * unit_price) - (quantity * unit_cost)) AS Gross_Profit,
+     ROUND((((s.quantity * p.unit_price)-(s.quantity * p.unit_cost))/((s.quantity * p.unit_price))) * 100,2) AS Gross_Profit_Margin,
+    (p.unit_price-p.unit_cost) AS Profit_Per_Unit,
+    p.supplier_id,sp.supplier_name,sp.country,
+    s.quantity,s.discount_percentage,s.sales_channel
+    
+	FROM sales s JOIN products p ON s.product_id=p.product_id
+		JOIN customers c ON c.customer_id=s.customer_id
+        JOIN suppliers sp  ON p.supplier_id = sp.supplier_id;
+SELECT * FROM erp_database.vw_sales_analysis;

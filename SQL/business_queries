@@ -1,0 +1,174 @@
+-- 1. Which product category show the highest Gross Profit?
+SELECT 
+	product_category AS Category,
+     COUNT(*) AS Number_of_Sales,
+    SUM(Gross_Profit) AS Gross_Profit
+FROM vw_sales_analysis
+GROUP BY 1
+ORDER BY 3 DESC;
+
+-- 2. Which are the Top-5 customers in terms of Revenues?
+SELECT 
+	customer_name AS Name_of_Customer,
+    SUM(Revenue) AS Total_Revenues,
+    SUM(Gross_Profit) AS Gross_Profit,
+    COUNT(*) AS Number_of_Orders,
+    ROUND(AVG(Revenue),2) AS Avg_Order_Value
+FROM vw_sales_analysis
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 5;
+
+-- 3: Which cities generate the highest Total Revenue and Gross Profit?
+SELECT 
+	city,
+    SUM(Revenue) AS Total_Revenues,
+    SUM(Gross_Profit) AS Total_Gross_Profit
+FROM vw_sales_analysis
+GROUP BY 1
+ORDER BY 2 DESC,3 DESC;
+
+-- 3.1: Which city performs best in terms of revenue, and which city generates the highest gross profit?
+(SELECT 
+	 'Highest Revenue' AS Performance_Metric,
+	city,
+    SUM(Revenue) AS Highest
+FROM vw_sales_analysis
+GROUP BY 2
+ORDER BY 3 DESC 
+LIMIT 1)
+UNION ALL
+(SELECT 
+	 'Highest Gross Profit' AS Performance_Metric,
+	city,
+    SUM(Gross_Profit) AS Highest
+FROM vw_sales_analysis
+GROUP BY 2
+ORDER BY 3 DESC 
+LIMIT 1);
+
+-- 4. Which sales channel generates the highest Revenue and Gross Profit?
+SELECT 
+	sales_channel AS Channel_of_Sales,
+    SUM(Revenue) AS Total_Revenues,
+    SUM(Gross_Profit) AS Total_Gross_Profit, 
+    COUNT(*) AS Total_Orders,
+    ROUND(AVG(Revenue),2) AS Average_Order_Value
+FROM vw_sales_analysis
+GROUP BY 1
+ORDER BY 2 DESC, 3 DESC;
+
+-- 5. Which product has the highest Gross Profit to the company?
+SELECT 
+	product_name AS Product,
+    SUM(Gross_Profit) AS Total_Gross_Profit,
+    COUNT(*) AS Total_Orders,
+    ROUND(AVG(Revenue),2) AS Average_Order_Value,
+    SUM(quantity) AS Total_Units_Sold
+FROM vw_sales_analysis
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10;
+
+-- 6. Scenario. The company plans a campaign for the most loyal customers. It wants to identify the most valuable customers based on some ctiteria.
+SELECT 
+	"Discount 10%" AS Reccomended_Discount,
+	customer_name AS Name,
+    SUM(Revenue) AS Total_Revenues,
+    SUM(Gross_Profit) AS Total_Gross_Profit,
+    COUNT(*) AS Total_Orders,
+    SUM(quantity) AS Total_Units_Sold,
+    ROUND(AVG(Revenue),2) AS Average_Order_Value
+FROM vw_sales_analysis
+GROUP BY name
+ORDER BY 3 DESC, 4 DESC, 5 desc
+LIMIT 3;
+
+-- 7. Which product does the company purchase the most?
+SELECT 
+	product_name AS Name,
+    supplier_name AS Name_of_Supplier,
+    COUNT(*) AS Total_Purchases,
+    ROUND(SUM(pu.quantity_purchased * pu.unit_purchased_cost),2) AS Total_Purchase_Cost,
+    ROUND(AVG(pu.unit_purchased_cost), 2) AS Average_Unit_Purchase_Cost
+FROM products p JOIN purchases pu ON p.product_id=pu.product_id
+	LEFT JOIN suppliers s ON s.supplier_id=p.supplier_id
+GROUP BY 1,2
+order by 3 desc, 4 DESC, 5 desc;
+
+-- 8. Which payment method do the customers prefer?
+SELECT 
+    payment_method AS Payment_Method, 
+    ROUND(SUM(amount_paid),2) AS Total_Amount,
+    ROUND(AVG(amount_paid),2) AS Avg_Amount,
+    COUNT(*) AS Number_of_Payments
+FROM payments p JOIN customers c ON p.customer_id= c.customer_id
+GROUP BY 1
+ORDER BY 2 DESC,3 DESC;
+
+-- 9. How much does the company spend for each supplier?
+SELECT 
+	supplier_name AS Name,
+    country AS Country_Supplier,
+    ROUND(SUM(quantity_purchased),2) AS Total_Quantity_Purchased,
+    ROUND(avg(quantity_purchased),2) AS Avg_Quantity_Purchased,
+    ROUND(SUM(quantity_purchased*unit_purchased_cost),2) AS Total_Spending
+FROM suppliers s JOIN purchases p ON s.supplier_id=p.supplier_id
+GROUP BY 1,2
+ORDER BY 5 DESC, 3 DESC;
+
+-- 10. Which months generate the highest Revenue and Gross Profit?
+SELECT 
+	month_name AS Month,
+    month AS month_number,
+    ROUND(SUM(Revenue),2) AS Total_Revenue,
+    ROUND(SUM(Gross_Profit),2) AS Total_Gross_Profit,
+    COUNT(*) AS Total_Orders,
+    ROUND(AVG(Revenue),2) AS Avg_Revenues
+FROM vw_sales_analysis v JOIN calendar c ON v.sale_date = c.date
+GROUP BY 1,2
+ORDER BY 2;
+
+-- 11. Analyze the expenses categories
+SELECT 
+	expense_category AS Category,
+    SUM(amount) AS Total_Expenses
+FROM expenses
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- 12. Which customer type generates the highest revenue and Gross Profit?
+SELECT 
+	customer_type AS Customer_Type,
+    ROUND(SUM(Revenue),2) AS Total_Revenues,
+    ROUND(SUM(Gross_Profit),2) AS Total_Gross_Profit,
+    ROUND(AVG(Revenue),2) AS Avg_Revenue,
+    COUNT(*) AS Total_Orders,
+    SUM(quantity) AS Total_Units_Sold
+FROM vw_sales_analysis
+GROUP BY 1
+ORDER BY 2 DESC, 3 DESC;
+
+-- 13. Scenario. The Internal Audit department wants to identify transactions that require additional review due to unusually high discounts or low profitability.
+SELECT
+    sale_id AS ID,
+    sale_date AS Date,
+    city AS City,
+    product_name AS Product,
+    Revenue, Gross_Profit,
+    Gross_Profit_Margin,
+    discount_percentage AS Discount,
+	sales_channel AS Channel_of_Sales,
+   CASE
+    WHEN discount_percentage >= 15
+        THEN 'High Risk'
+
+    WHEN discount_percentage >= 10
+         OR Gross_Profit_Margin < 20
+        THEN 'Medium Risk'
+
+    ELSE 'Low Risk'
+END AS Audit_Risk
+
+FROM vw_sales_analysis
+ORDER BY Discount DESC, Gross_Profit_Margin desc

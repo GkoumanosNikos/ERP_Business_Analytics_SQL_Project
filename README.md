@@ -1,4 +1,4 @@
-# Small Business ERP Analytics | SQL Project
+# Small Business ERP Analytics | SQL & Power BI Project
 
 ## Project Overview
 
@@ -49,7 +49,9 @@ Management wants to use this information to answer questions related to:
 - Microsoft Excel
 - CSV
 - GitHub
-
+- Power BI
+- Power Query
+- DAX
 ---
 
 ## Dataset Overview
@@ -584,3 +586,27 @@ The classification is an analytical screening mechanism and does not prove that 
 ![Internal Audit Risk Analysis](screenshots/Audit_Risk.png)
 
 ---
+
+## Power BI Dashboard
+
+A Power BI Dashboard was created to visualize the performance of the company. 
+
+The dashboard incudes:
+- An overview of financial performance
+- Total Revenue per category
+- Gross Profit per category
+- Product Performance Analysis
+- Top Products by Units Sold
+
+  ### Executive Overview
+
+  ![Executive Overview](screenshots/overview_powerbi.png)
+
+  ### Sales & Products Overview
+
+  ![Sales & Products Overview](screenshots/sales&products_powerbi.png)
+
+  ### Purchase & Expenses Overview
+
+  ![Purchase & Expenses Overview](screenshots/purchase&expenses_powerbi.png)
+  
